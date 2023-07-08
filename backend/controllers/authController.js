@@ -1,0 +1,122 @@
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
+const qrCodeHelper = require('../helper/qrcode.js');
+const config  = require('../config.js');
+
+const createUser = async (req, res) => {
+    const { username, password } = req.body;
+
+    // Check if the username already exists
+    const existingUser = await User.findOne({ username });
+    if (existingUser) {
+        return res.status(409).json({ error: 'Username already exists' });
+    }
+
+    try {
+        // Hash the password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const uniqueQr = await qrCodeHelper.generateQRCode("park");
+        // Create a new user
+        const newUser = new User({
+            username: username,
+            password: hashedPassword,
+            qrCodeUrl: uniqueQr,  
+        });
+
+        // Save the user to the database
+        await newUser.save();
+
+        res.status(201).json({ message: 'User created successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+const changePassword = async (req,res) => {
+  const { oldPassword, newPassword } = req.body;
+
+  try {
+    // Find the user by ID
+    const user = await User.findById(req.user);
+
+    // If the user is not found, return an error response
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Compare the old password with the stored password
+    const isPasswordCorrect = await bcrypt.compare(oldPassword, user.password);
+
+    // If the old password is incorrect, return an error response
+    if (!isPasswordCorrect) {
+      return res.status(401).json({ error: 'Incorrect old password' });
+    }
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update the user's password
+    user.password = hashedPassword;
+    await user.save();
+
+    res.json({ message: 'Password changed successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+async function login(req, res) {
+    // Retrieve the username and password from the request body
+    const { username, password } = req.body;
+
+    // Find the user based on the username
+    const user = await User.findOne({ username });
+
+    // If user not found or password is incorrect, return an error response
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+        return res.status(401).json({ error: 'Invalid username or password' });
+    }
+
+    // Generate a JWT token
+    const token = jwt.sign({ userId: user._id }, config.secret_key);
+
+    // Return the token in the response
+    res.json({ token });
+}
+
+function authenticateToken(req, res, next) {
+    // Retrieve the token from the request header
+    const authHeader = req.headers.authorization;
+    const token = authHeader && authHeader.split(' ')[1];
+
+    // If no token is provided, return an error response
+    if (!token) {
+        return res.status(401).json({ error: 'Token not found' });
+    }
+
+    // Verify the token
+    jwt.verify(token, config.secret_key, (err, decodedToken) => {
+        // If the token is invalid, return an error response
+        if (err) {
+            return res.status(403).json({ error: 'Invalid token' });
+        }
+
+        // Attach the decoded token payload to the request object
+        req.user = decodedToken;
+
+        // Proceed to the next middleware or route
+        next();
+    });
+}
+
+module.exports = {
+    createUser,
+    login,
+    authenticateToken,
+    changePassword,
+};
+
