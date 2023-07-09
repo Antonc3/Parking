@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button, StyleSheet } from 'react-native';
+import axios from './api';
+
 
 const CreateAccountScreen = ({ navigation }) => {
     const [username, setUsername] = useState('');
@@ -20,6 +22,20 @@ const CreateAccountScreen = ({ navigation }) => {
         if (!fieldsValid) {
             return;
         }
+        
+        const data = {
+            username: username,
+            password: password,
+            email: email,
+            phone: phoneNumber,
+        }
+        axios.put('/user/create/',data)
+        .then((response) =>{
+
+        })
+        .catch((err) => {
+            console.log(err);
+        });
 
         // Implement your create account logic here
         // For simplicity, we'll just navigate to the login screen

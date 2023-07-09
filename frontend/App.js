@@ -7,12 +7,19 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Provider } from 'react-redux';
 import { store } from './src/store';
 
+import { NativeModules } from 'react-native';
+import dotenv from 'dotenv';
+
 import { LoginScreen } from './src/LoginScreen.js';
 import { PaymentScreen } from './src/PaymentScreen.js';
 import { HomeScreen } from './src/HomeScreen.js';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
+const { Config } = NativeModules;
+
+dotenv.config({path: Config.MAIN_BUNDLE_PATH});
+
 export default function App() {
 
     return (

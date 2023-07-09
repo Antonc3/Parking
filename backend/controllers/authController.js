@@ -5,14 +5,22 @@ const qrCodeHelper = require('../helper/qrcode.js');
 const config  = require('../config.js');
 
 const createUser = async (req, res) => {
-    const { username, password } = req.body;
+    const { username, password, phone, email} = req.body;
 
     // Check if the username already exists
     const existingUser = await User.findOne({ username });
     if (existingUser) {
         return res.status(409).json({ error: 'Username already exists' });
     }
+    existingUser = await User.findOne({ phone });
+    if (existingUser) {
+        return res.status(409).json({ error: 'Phone number already in use' });
+    }
 
+    existingUser = await User.findOne({ email });
+    if (existingUser) {
+        return res.status(409).json({ error: 'Email already in use' });
+    }
     try {
         // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -22,6 +30,8 @@ const createUser = async (req, res) => {
         const newUser = new User({
             username: username,
             password: hashedPassword,
+            phone: phone,
+            email: email,
             qrCodeUrl: uniqueQr,  
         });
 
