@@ -1,12 +1,13 @@
 const User = require('../models/User');
-const genQrCode = require('../helper/qrcode.js');
+const stringHelper = require('../helper/stringHelper.js');
+const config = require('../config.js');
 
-const updateQrCode = async (req,res) => {
-    const newQr = genQrCode.generateQRCode("park");
-    await User.findByIdAndUpdate(req.user, {qrCodeUrl: newQr}, {new: true})
+const updateQrIdentifier = async (req,res) => {
+    const newQr = await stringHelper.genUniqueIdentifier(config.identifierLength);
+    await User.findByIdAndUpdate(req.user, {qrIdentifier: newQr}, {new: true})
         .then(updatedUser =>{
             if(updatedUser){
-                res.json({ message: "User qrCode successfully changed"});
+                res.json({ qrIdentifier: newQr, message: "User qrCode identifier successfully changed"});
             }
             else{
                 res.status(404).json({ error: 'User not found or no changes were made' });
@@ -17,7 +18,7 @@ const updateQrCode = async (req,res) => {
             res.status(500).json({ error: 'Internal Server Error' });
         });
 };
-const getQrCode = async (req,res) => {
+const getQrIdentifier = async (req,res) => {
     try {
         const user = await User.findById(req.user);
 
@@ -25,7 +26,7 @@ const getQrCode = async (req,res) => {
             return res.status(404).json({ error: 'User not found' });
         }
 
-        res.json({ qrCode: user.qrCodeUrl });
+        res.json({ qrIdentifier: user.qrIdentifier });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
@@ -33,7 +34,7 @@ const getQrCode = async (req,res) => {
 };
 
 module.exports = {
-    updateQrCode,
-    getQrCode,
+    updateQrIdentifier,
+    getQrIdentifier,
 }
 

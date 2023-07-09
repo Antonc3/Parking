@@ -5,7 +5,7 @@ const userSchema = new mongoose.Schema({
     password: String,
     phone: String,
     email: String,
-    qrCodeUrl: String
+    qrIdentifier: String
 });
 
 const User = mongoose.model('User', userSchema);

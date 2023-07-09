@@ -1,6 +1,8 @@
 const initialState = {
     username: '',
     token: ''
+    qrCodeData: '',
+    isLoggedIn: false,
 };
 
 const userReducer = (state = initialState, action) => {
@@ -9,6 +11,10 @@ const userReducer = (state = initialState, action) => {
       return { ...state, username: action.payload };
     case 'SET_TOKEN':
       return { ...state, token: action.payload };
+    case 'SET_ISLOGGEDIN':
+      return { ...state, isLoggedIn: action.payload };
+    case 'SET_QRCODEDATA':
+      return { ...state, qrCodeData: action.payload };
     default:
       return state;
   }

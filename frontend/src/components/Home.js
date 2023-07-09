@@ -1,21 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { SvgXml } from 'react-native-svg';
-import axios from 'axios';
+import axios from '../api.js';
+import { useSelector } from 'react-redux';
 
 const Home = () => {
   const [qrCodeData, setQRCodeData] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-
+  const token = useSelector((state) => state.user.token);
   useEffect(() => {
     fetchQRCodeData();
   }, []);
 
   const fetchQRCodeData = async () => {
     try {
-      const response = await axios.get('YOUR_SERVER_ENDPOINT');
-      const qrCodeData = response.data.qrCodeData;
-      setQRCodeData(qrCodeData);
+      const response = await axios.get('/user/qrCode',
+        {
+            headers: {
+                Authorization: 'Bearer: ${token}',
+            }
+        });
+      setQRCodeData(response.data.qrCode);
       setIsLoading(false);
     } catch (error) {
       console.error(error);
@@ -23,7 +28,7 @@ const Home = () => {
     }
   };
 
-  if (isLoading) {
+  if (isLoading) {ata
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator size="large" />
@@ -33,7 +38,7 @@ const Home = () => {
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <SvgXml xml={qrCodeData} width={200} height={200} />
+      <img src=qrCodeData />
     </View>
   );
 };

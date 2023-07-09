@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const qrCodeHelper = require('../helper/qrcode.js');
+const stringHelper = require('../helper/stringHelper.js');
 const config  = require('../config.js');
 
 const createUser = async (req, res) => {
@@ -10,29 +10,29 @@ const createUser = async (req, res) => {
     // Check if the username already exists
     const existingUser = await User.findOne({ username });
     if (existingUser) {
-        return res.status(409).json({ error: 'Username already exists' });
+        return res.status(409).json({ field: 'username', error: 'Username already exists' });
     }
     existingUser = await User.findOne({ phone });
     if (existingUser) {
-        return res.status(409).json({ error: 'Phone number already in use' });
+        return res.status(409).json({ field: 'phone',error: 'Phone number already in use' });
     }
 
     existingUser = await User.findOne({ email });
     if (existingUser) {
-        return res.status(409).json({ error: 'Email already in use' });
+        return res.status(409).json({ field: 'email',error: 'Email already in use' });
     }
     try {
         // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const uniqueQr = await qrCodeHelper.generateQRCode("park");
+        const uniqueIdentifier = await stringHelper.genUniqueIdentifier(config.identifierLength);
         // Create a new user
         const newUser = new User({
             username: username,
             password: hashedPassword,
             phone: phone,
             email: email,
-            qrCodeUrl: uniqueQr,  
+            qrIdentifier: uniqueIdentifier,  
         });
 
         // Save the user to the database
@@ -54,7 +54,7 @@ const changePassword = async (req,res) => {
 
     // If the user is not found, return an error response
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ field: 'username',error: 'User not found' });
     }
 
     // Compare the old password with the stored password
@@ -62,7 +62,7 @@ const changePassword = async (req,res) => {
 
     // If the old password is incorrect, return an error response
     if (!isPasswordCorrect) {
-      return res.status(401).json({ error: 'Incorrect old password' });
+      return res.status(401).json({ field: 'password', error: 'Incorrect old password' });
     }
 
     // Hash the new password

@@ -10,9 +10,10 @@ import { store } from './src/store';
 import { NativeModules } from 'react-native';
 import dotenv from 'dotenv';
 
-import { LoginScreen } from './src/LoginScreen.js';
-import { PaymentScreen } from './src/PaymentScreen.js';
-import { HomeScreen } from './src/HomeScreen.js';
+import { LoginScreen } from './src/components/LoginScreen.js';
+import { PaymentScreen } from './src/components/PaymentScreen.js';
+import { HomeScreen } from './src/components/HomeScreen.js';
+import { withAuthentication } from './src/components/withAuthentication.js';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -25,12 +26,9 @@ export default function App() {
     return (
         <Provider store={store}>
         <NavigationContainer>
-        <Stack.Navigator>
-            <Stack.Screen name="Login" component={LoginScreen}/>
-        </Stack.Navigator>
         <Tab.Navigator>
             <Tab.Screen name="Home" component={HomeScreen} />
-            <Tab.Screen name="Payment" component={PaymentScreen} />
+            <Tab.Screen name="Payment" component={withAuthentication(PaymentScreen)} />
             <Tab.Screen name="Login" component={LoginScreen} />
         </Tab.Navigator>
         </NavigationContainer>

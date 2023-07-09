@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button, StyleSheet } from 'react-native';
-import axios from './api';
+import axios from '../api';
+import { setUsername, setToken } from '../actions/UserActions.js';
 
 
-const CreateAccountScreen = ({ navigation }) => {
-    const [username, setUsername] = useState('');
+const CreateAccountScreen = ({ navigation, dispatch}) => {
+    const [username, setUsername_] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [email, setEmail] = useState('');
@@ -31,20 +32,34 @@ const CreateAccountScreen = ({ navigation }) => {
         }
         axios.put('/user/create/',data)
         .then((response) =>{
-
+            const status = response.status;
+            if(status==201){
+                axios.put('/user/login/',{username: username, password: password}).
+                    then((response) =>{
+                        dispatch(setToken(response.token));
+                        dispatch(setUsername(username));
+                    })
+            }
+            else{
+                console.log(response.data);
+            }
         })
         .catch((err) => {
             console.log(err);
         });
 
-        // Implement your create account logic here
-        // For simplicity, we'll just navigate to the login screen
         navigation.navigate('Login');
     };
 
     const validateFields = () => {
         let isValid = true;
-        const updatedValidFields = { ...validFields };
+        const updatedValidFields = {
+            username: true,
+            password: true,
+            confirmPassword: true,
+            email: true,
+            phoneNumber: true,
+        };
 
         if (password !== confirmPassword) {
             updatedValidFields.password = false;
@@ -91,7 +106,7 @@ const CreateAccountScreen = ({ navigation }) => {
         style={styles.input}
         placeholder="Username"
         value={username}
-        onChangeText={(text) => setUsername(text)}
+        onChangeText={(text) => setUsername_(text)}
         />
         <TextInput
         style={styles.input}
