@@ -3,10 +3,10 @@ import { View, ActivityIndicator } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import axios from '../api.js';
 import { useSelector } from 'react-redux';
+import { connect } from 'react-redux';
 
 const Home = () => {
   const [qrCodeData, setQRCodeData] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
   const token = useSelector((state) => state.user.token);
   useEffect(() => {
     fetchQRCodeData();
@@ -17,7 +17,7 @@ const Home = () => {
       const response = await axios.get('/user/qrCode',
         {
             headers: {
-                Authorization: 'Bearer: ${token}',
+                Authorization: `Bearer: ${token}`,
             }
         });
       setQRCodeData(response.data.qrCode);
@@ -38,7 +38,7 @@ const Home = () => {
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <img src=qrCodeData />
+
     </View>
   );
 };

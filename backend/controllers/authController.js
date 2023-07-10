@@ -95,7 +95,7 @@ async function login(req, res) {
     const token = jwt.sign({ userId: user._id }, config.secret_key);
 
     // Return the token in the response
-    res.json({ token });
+    res.json({ token, username });
 }
 
 function authenticateToken(req, res, next) {
