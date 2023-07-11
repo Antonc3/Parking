@@ -1,91 +1,69 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { setUsername, setToken } from './actions/UserActions.js';
+import { login } from './actions/UserActions.js';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 
-const LoginScreen = ({ navigation }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
-    // Handle login logic here
-  };
+const LoginScreen = ({ navigation, user, login}) => {
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
 
-  const handleCreateAccount = () => {
-    // Handle create account navigation or logic here
-  };
+    useEffect(() =>{
+        if(user.isLoggedIn){
+            navigation.navigate('Home');
+        }
+    }, [user.isLoggedIn]);
+    const handleLogin = () => {
+        login(username,password);
+    };
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
+    const handleCreateAccount = () => {
+        navigation.navigate('CreateAccount');
+    };
 
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        onChangeText={(text) => setEmail(text)}
-        value={email}
-        keyboardType="email-address"
+    return (
+        <View }>
+        <Text }>Login</Text>
+
+        <TextInput
+        placeholder="Username"
+        onChangeText={(text) => setUsername(text)}
+        value={username}
+        keyboardType="Username"
         autoCapitalize="none"
-      />
+        />
 
-      <TextInput
-        style={styles.input}
+        <TextInput
         placeholder="Password"
         onChangeText={(text) => setPassword(text)}
         value={password}
         secureTextEntry
-      />
+        />
 
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Login</Text>
-      </TouchableOpacity>
+        {user.error &&
+            (<div>
+                <p>Error: {user.error}</p>
+                </div>)
+        }
 
-      <TouchableOpacity onPress={handleCreateAccount}>
-        <Text style={styles.createAccountText}>Create Account</Text>
-      </TouchableOpacity>
-    </View>
-  );
+        <TouchableOpacity onPress={handleLogin}>
+        <Text >Login</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={handleCreateAccount}>
+        <Text >Create Account</Text>
+        </TouchableOpacity>
+        </View>
+    );
 };
+const mapStateToProps = (state) => {
+    return {
+        user: state.user,
+    };
+};
+const mapDispstachToProps = {
+    login,
+}
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  input: {
-    width: '100%',
-    height: 50,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 10,
-  },
-  button: {
-    width: '100%',
-    height: 50,
-    backgroundColor: 'blue',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 5,
-    marginBottom: 10,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  createAccountText: {
-    fontSize: 16,
-    color: 'blue',
-  },
-});
 
-export default LoginScreen;
+export default connect(mapStateToProps,mapDispstachToProps)(LoginScreen);

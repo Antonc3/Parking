@@ -8,7 +8,7 @@ const createUser = async (req, res) => {
     const { username, password, phone, email} = req.body;
 
     // Check if the username already exists
-    const existingUser = await User.findOne({ username });
+    var existingUser = await User.findOne({ username });
     if (existingUser) {
         return res.status(409).json({ field: 'username', error: 'Username already exists' });
     }

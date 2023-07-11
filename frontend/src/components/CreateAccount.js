@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import { View, TextInput, Button, StyleSheet } from 'react-native';
-import axios from '../api';
-import { setUsername, setToken } from '../actions/UserActions.js';
+import { connect } from 'react-redux';
+import { createAccount } from '../actions/UserActions.js';
 
 
-const CreateAccountScreen = ({ navigation, dispatch}) => {
+const CreateAccountScreen = ({ navigation, user, createAccount }) => {
     const [username, setUsername_] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -17,38 +17,21 @@ const CreateAccountScreen = ({ navigation, dispatch}) => {
         email: true,
         phoneNumber: true,
     });
+    useEffect(() =>{
+        if(user.isLoggedIn){
+            navigation.navigate('Home');
+        }
+    },[user.isLoggedIn]);
+    useEffect(() =>{
+
+    }, [user.error]);
 
     const handleCreateAccount = () => {
         const fieldsValid = validateFields();
         if (!fieldsValid) {
             return;
         }
-        
-        const data = {
-            username: username,
-            password: password,
-            email: email,
-            phone: phoneNumber,
-        }
-        axios.put('/user/create/',data)
-        .then((response) =>{
-            const status = response.status;
-            if(status==201){
-                axios.put('/user/login/',{username: username, password: password}).
-                    then((response) =>{
-                        dispatch(setToken(response.token));
-                        dispatch(setUsername(username));
-                    })
-            }
-            else{
-                console.log(response.data);
-            }
-        })
-        .catch((err) => {
-            console.log(err);
-        });
-
-        navigation.navigate('Login');
+        createAccount(username,password,email,phone);
     };
 
     const validateFields = () => {
@@ -81,12 +64,6 @@ const CreateAccountScreen = ({ navigation, dispatch}) => {
         return isValid;
     };
 
-    const confirmPasswordStyle = validFields.password ? styles.input : styles.inputError;
-    const confirmPassErrorStyle = validFields.confirmPassword ? null : styles.errorText;
-    const emailStyle = validFields.email ? styles.input : styles.inputError;
-    const emailErrorStyle = validFields.email ? null : styles.errorText;
-    const phoneStyle = validFields.phoneNumber ? styles.input : styles.inputError;
-    const phoneErrorStyle = validFields.phoneNumber ? null : styles.errorText;
 
     const validateEmail = (email) => {
         // Email validation logic (you can use regex or any other validation library)
@@ -101,76 +78,59 @@ const CreateAccountScreen = ({ navigation, dispatch}) => {
     };
 
     return (
-        <View style={styles.container}>
+        <View >
         <TextInput
-        style={styles.input}
         placeholder="Username"
         value={username}
         onChangeText={(text) => setUsername_(text)}
         />
         <TextInput
-        style={styles.input}
         placeholder="Password"
         secureTextEntry
         value={password}
         onChangeText={(text) => setPassword(text)}
         />
         <TextInput
-        style={confirmPasswordStyle}
         placeholder="Confirm Password"
         secureTextEntry
         value={confirmPassword}
         onChangeText={(text) => setConfirmPassword(text)}
         />
-        {!validFields.password && <Text style={styles.errorText}>Passwords do not match</Text>}
+        {!validFields.password && <Text >Passwords do not match</Text>}
         <TextInput
-        style={emailStyle}
         placeholder="Email"
         keyboardType="email-address"
         value={email}
         onChangeText={(text) => setEmail(text)}
         />
-        {!validFields.email && <Text style={styles.errorText}>Invalid email</Text>}
+        {!validFields.email && <Text >Invalid email</Text>}
         <TextInput
-        style={phoneStyle}
         placeholder="Phone Number"
         keyboardType="phone-pad"
         value={phoneNumber}
         onChangeText={(text) => setPhoneNumber(text)}
         />
-        {!validFields.phoneNumber && <Text style={styles.errorText}>Invalid phone number</Text>}
+        {!validFields.phoneNumber && <Text >Invalid phone number</Text>}
+        {user.error &&
+            (<div }>
+                <p>Error: {user.error}</p>
+            </div>)
+        }
+
         <Button title="Create Account" onPress={handleCreateAccount} />
         </View>
     );
 };
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    input: {
-        width: '80%',
-        height: 40,
-        borderWidth: 1,
-        borderColor: 'gray',
-        marginBottom: 10,
-        paddingHorizontal: 10,
-    },
-    inputError: {
-        width: '80%',
-        height: 40,
-        borderWidth: 1,
-        borderColor: 'red',
-        marginBottom: 10,
-        paddingHorizontal: 10,
-    },
-    errorText: {
-        color: 'red',
-        marginBottom: 10,
-    },
-});
+const mapStateToProps = (state) =>{
+    return {
+        user: state.user,
+    };
+};
+const mapDispatchToProps = {
+    createAccount,
+};
 
-export default CreateAccountScreen;
+
+export default connect(mapStateToProps,mapDispatchToProps)(CreateAccountScreen);
 

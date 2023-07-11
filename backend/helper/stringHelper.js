@@ -13,11 +13,11 @@ const generateRandomString = (n) => {
 };
 
 const genUniqueIdentifier = async (n) =>{
-    const str = generateRandomString(n);
-    const unique = false; 
+    var str = generateRandomString(n);
+    var unique = false; 
     while(!unique){
         const foundUser = await User.findOne({qrCodeIdentifier: str})
-        if(foundUser){
+        if(!foundUser){
             unique = true;
         }
         else{

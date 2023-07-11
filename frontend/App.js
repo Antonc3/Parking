@@ -11,6 +11,7 @@ import { NativeModules } from 'react-native';
 import dotenv from 'dotenv';
 
 import { LoginScreen } from './src/components/LoginScreen.js';
+import { CreateAccount } from './src/components/CreateAccount.js';
 import { PaymentScreen } from './src/components/PaymentScreen.js';
 import { HomeScreen } from './src/components/HomeScreen.js';
 import { withAuthentication } from './src/components/withAuthentication.js';
@@ -21,16 +22,18 @@ const { Config } = NativeModules;
 
 dotenv.config({path: Config.MAIN_BUNDLE_PATH});
 
+
 export default function App() {
 
     return (
         <Provider store={store}>
         <NavigationContainer>
-        <Tab.Navigator>
-            <Tab.Screen name="Home" component={HomeScreen} />
-            <Tab.Screen name="Payment" component={withAuthentication(PaymentScreen)} />
-            <Tab.Screen name="Login" component={LoginScreen} />
-        </Tab.Navigator>
+        <Stack.Navigator initialRouteName="Home">
+            <Stack.Screen name="Home" component={withAuthentication(HomeScreen)} />
+            <Stack.Screen name="Payment" component={withAuthentication(PaymentScreen)} />
+            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="CreateAccount" component={CreateAccount} />
+        </Stack.Navigator>
         </NavigationContainer>
         </Provider>
     );

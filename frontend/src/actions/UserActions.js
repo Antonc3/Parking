@@ -7,13 +7,18 @@ export const login = (username, password) => {
         try {
             const response = await axios.post('/user/login', { username, password });
             const { token, user } = response.data;
-            dispatch({ type: 'LOGIN_SUCCESS', payload: { token, username } });
+            dispatch({ type: 'LOGIN_SUCCESS', payload: { token, username: user} });
         } catch (error) {
             dispatch(userError(error.message));
         }
     };
 };
 
+export const logout = () => {
+    return {
+        type: 'LOGOUT',
+    }
+};
 export const createAccount = (username, password, email, phone) =>{
     return async (dispatch) =>{
         try{
