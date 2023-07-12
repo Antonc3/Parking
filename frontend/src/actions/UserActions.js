@@ -46,6 +46,7 @@ export const fetchQrData = () =>{
         }
     };
 };
+
 export const userError = (error) =>{
     return {
         type: 'USER_ERROR',

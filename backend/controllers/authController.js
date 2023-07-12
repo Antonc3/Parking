@@ -2,10 +2,11 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const stringHelper = require('../helper/stringHelper.js');
-const config  = require('../config.js');
+const config = require('../config.js');
+const stripe = require('stripe')(config.stripe.secret_key);
 
 const createUser = async (req, res) => {
-    const { username, password, phone, email} = req.body;
+    const { username, password, phone, email } = req.body;
 
     // Check if the username already exists
     var existingUser = await User.findOne({ username });
@@ -14,25 +15,33 @@ const createUser = async (req, res) => {
     }
     existingUser = await User.findOne({ phone });
     if (existingUser) {
-        return res.status(409).json({ field: 'phone',error: 'Phone number already in use' });
+        return res.status(409).json({ field: 'phone', error: 'Phone number already in use' });
     }
 
     existingUser = await User.findOne({ email });
     if (existingUser) {
-        return res.status(409).json({ field: 'email',error: 'Email already in use' });
+        return res.status(409).json({ field: 'email', error: 'Email already in use' });
     }
     try {
         // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const uniqueIdentifier = await stringHelper.genUniqueIdentifier(config.identifierLength);
+        const stripeCustomer = await stripe.customers.create({
+            email,
+            phone,
+            name: username,
+        });
         // Create a new user
         const newUser = new User({
             username: username,
             password: hashedPassword,
             phone: phone,
             email: email,
-            qrIdentifier: uniqueIdentifier,  
+            qrIdentifier: uniqueIdentifier,
+            payment: {
+                stripeCustomerId: stripeCustomer.id
+            }
         });
 
         // Save the user to the database
@@ -45,41 +54,41 @@ const createUser = async (req, res) => {
     }
 };
 
-const changePassword = async (req,res) => {
-  const { oldPassword, newPassword } = req.body;
+const changePassword = async (req, res) => {
+    const { oldPassword, newPassword } = req.body;
 
-  try {
-    // Find the user by ID
-    const user = await User.findById(req.user);
+    try {
+        // Find the user by ID
+        const user = await User.findById(req.user);
 
-    // If the user is not found, return an error response
-    if (!user) {
-      return res.status(404).json({ field: 'username',error: 'User not found' });
+        // If the user is not found, return an error response
+        if (!user) {
+            return res.status(404).json({ field: 'username', error: 'User not found' });
+        }
+
+        // Compare the old password with the stored password
+        const isPasswordCorrect = await bcrypt.compare(oldPassword, user.password);
+
+        // If the old password is incorrect, return an error response
+        if (!isPasswordCorrect) {
+            return res.status(401).json({ field: 'password', error: 'Incorrect old password' });
+        }
+
+        // Hash the new password
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        // Update the user's password
+        user.password = hashedPassword;
+        await user.save();
+
+        res.json({ message: 'Password changed successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
-
-    // Compare the old password with the stored password
-    const isPasswordCorrect = await bcrypt.compare(oldPassword, user.password);
-
-    // If the old password is incorrect, return an error response
-    if (!isPasswordCorrect) {
-      return res.status(401).json({ field: 'password', error: 'Incorrect old password' });
-    }
-
-    // Hash the new password
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-    // Update the user's password
-    user.password = hashedPassword;
-    await user.save();
-
-    res.json({ message: 'Password changed successfully' });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
 };
 
-async function login(req, res) {
+const login = async (req, res) => {
     // Retrieve the username and password from the request body
     const { username, password } = req.body;
 
@@ -98,7 +107,7 @@ async function login(req, res) {
     res.json({ token, username });
 }
 
-function authenticateToken(req, res, next) {
+const authenticateToken = (req, res, next) => {
     // Retrieve the token from the request header
     const authHeader = req.headers.authorization;
     const token = authHeader && authHeader.split(' ')[1];

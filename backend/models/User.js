@@ -4,14 +4,17 @@ const userSchema = new mongoose.Schema({
     username: {
         type: String,
         default: '',
+        required: true,
     },
     password: {
         type: String,
         default: '',
+        required: true,
     },
     phone: {
         type: String,
         default: '',
+        required: true,
     },
     email: {
         type: String,
@@ -29,6 +32,20 @@ const userSchema = new mongoose.Schema({
         type: Number,
         default: 0,
     },
+    payment: {
+        stipeCustomerId: {
+            type: String,
+            required: true,
+        },
+        activePaymentIndex: {
+            type: Number,
+            default: 0,
+        },
+        paymentMethodCount: {
+            type: Number,
+            default: 0,
+        }
+    }
 });
 
 const User = mongoose.model('User', userSchema);

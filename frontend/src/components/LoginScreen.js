@@ -22,8 +22,8 @@ const LoginScreen = ({ navigation, user, login}) => {
     };
 
     return (
-        <View }>
-        <Text }>Login</Text>
+        <View>
+        <Text>Login</Text>
 
         <TextInput
         placeholder="Username"
