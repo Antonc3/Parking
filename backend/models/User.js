@@ -37,12 +37,8 @@ const userSchema = new mongoose.Schema({
             type: String,
             required: true,
         },
-        activePaymentIndex: {
-            type: Number,
-            default: 0,
-        },
-        paymentMethodCount: {
-            type: Number,
+        activePaymentId: {
+            type: String,
             default: 0,
         }
     }
