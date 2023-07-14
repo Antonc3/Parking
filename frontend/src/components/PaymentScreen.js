@@ -1,12 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { fetchPaymentMethods, setActivePaymentMethod, addPaymentMethod } from '../actions/PaymentActions';
 import AddPaymentMethod from './AddPaymentMethod';
 
-const PaymentMethods = () => {
-  const stripe = useStripe();
-  const elements = useElements();
+const PaymentScreen = () => {
   const dispatch = useDispatch();
   const paymentMethods = useSelector((state) => state.payment.paymentMethods);
   const activePayment = useSelector((state.payment.activePayment))
@@ -47,4 +44,4 @@ const PaymentMethods = () => {
   );
 };
 
-export default PaymentMethods;
+export default PaymentScreen;

@@ -1,50 +1,54 @@
 import React, { useState } from 'react';
-import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { Constants } from 'expo-constants';
+import { View, Text, TouchableOpacity, Alert } from 'react-native'
+import { CardField, useStripe } from '@stripe/stripe-react-native';
 
-const AddPaymentMethod = ({ onPaymentMethodAdded }) => {
-  const stripe = useStripe();
-  const elements = useElements();
-  const [error, setError] = useState(null);
+const AddPaymentMethod = ({ onSuccess }) => {
+  const { createPaymentMethod } = useStripe();
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
-    if (!stripe || !elements) {
-      return;
-    }
-
-    const cardElement = elements.getElement(CardElement);
+  const handleAddPaymentMethod = async () => {
+    setLoading(true);
 
     try {
-      const { error, paymentMethod } = await stripe.createPaymentMethod({
-        type: 'card',
-        card: cardElement,
+      const { paymentMethod, error } = await createPaymentMethod({
+        type: 'Card',
       });
 
       if (error) {
-        throw error;
+        Alert.alert('Error', error.message);
+      } else {
+        onSuccess(paymentMethod);
       }
-
-      // Pass the paymentMethod object to the parent component
-      onPaymentMethodAdded(paymentMethod);
     } catch (error) {
       console.log('Error:', error);
-      setError(error.message);
+      Alert.alert('Error', 'Failed to add payment method.');
     }
-  };
 
+    setLoading(false);
+  };
   return (
-    <div>
-      <h2>Add New Payment Method</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Card Details</label>
-          <CardElement options={{ style: { base: { fontSize: '16px' } } }} />
-        </div>
-        {error && <div>{error}</div>}
-        <button type="submit">Add Payment Method</button>
-      </form>
-    </div>
+    <View>
+      <Text>Add Payment Method</Text>
+        <StripeProvider 
+        publishableKey={Constants.expoConfig.extra.STRIPE_PUB_KEY}
+        merchantIdentifier="merchant.com.parkingpay1234"
+        >
+        <CardField
+          postalCodeEnabled={false}
+          placeholder={{
+            number: '4242 4242 4242 4242',
+          }}
+          cardStyle={{
+            backgroundColor: '#FFFFFF',
+            textColor: '#000000',
+          }}
+        />
+      </StripeProvider>
+      <TouchableOpacity onPress={handleAddPaymentMethod} disabled={loading}>
+        <Text>Add</Text>
+      </TouchableOpacity>
+    </View>
   );
 };
 

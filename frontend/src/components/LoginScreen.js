@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { login } from './actions/UserActions.js';
+import { login } from '../actions/UserActions.js';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 
 

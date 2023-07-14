@@ -1,5 +1,5 @@
 const config = require('../config');
-const stripe = requrie('stripe')(config.stripe.secret_key);
+const stripe = require('stripe')(config.stripe.secret_key);
 const User = require('../models/User')
 
 const saveCard = async (req, res) => {

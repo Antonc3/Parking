@@ -33,13 +33,13 @@ const userSchema = new mongoose.Schema({
         default: 0,
     },
     payment: {
-        stipeCustomerId: {
+        stripeCustomerId: {
             type: String,
             required: true,
         },
         activePaymentId: {
             type: String,
-            default: 0,
+            default: '',
         }
     }
 });

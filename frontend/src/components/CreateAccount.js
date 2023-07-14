@@ -112,7 +112,7 @@ const CreateAccountScreen = ({ navigation, user, createAccount }) => {
         />
         {!validFields.phoneNumber && <Text >Invalid phone number</Text>}
         {user.error &&
-            (<div }>
+            (<div>
                 <p>Error: {user.error}</p>
             </div>)
         }
