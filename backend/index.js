@@ -2,12 +2,14 @@ const express = require('express');
 const mongoose = require('mongoose');
 const routes = require('./routes');
 const config = require('./config.js');
+const cors = require('cors')
 
 const serverPort = config.server.port;
 const serverHost = config.server.host;
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 // Connect to MongoDB
 const databaseUri = `mongodb+srv://${config.database.user}:${config.database.password}@${config.database.uri}/${config.database.name}?retryWrites=true&w=majority`;

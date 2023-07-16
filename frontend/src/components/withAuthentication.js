@@ -1,8 +1,9 @@
 import React from 'react';
-import { connect } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 const withAuthentication = (WrappedComponent) => {
-  const AuthenticationCheck = ({ navigation, isLoggedIn, ...props }) => {
+  const AuthenticationCheck = ({navigation, ...props }) => {
+    const { isLoggedIn } = useSelector((state) => state.user);
     if (!isLoggedIn) {
       // Redirect the user to the login page if not logged in
       navigation.replace('Login');
@@ -12,13 +13,7 @@ const withAuthentication = (WrappedComponent) => {
     return <WrappedComponent {...props} />;
   };
 
-  const mapStateToProps = (state) => {
-    return {
-      isLoggedIn: state.user.isLoggedIn,
-    };
-  };
-
-  return connect(mapStateToProps)(AuthenticationCheck);
+  return AuthenticationCheck;
 };
 
 export default withAuthentication;

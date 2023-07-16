@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
-import userReducer from './userReducer';
-import paymentReducer from './paymentReducer';
+import userReducer from './userSlice';
+import paymentReducer from './paymentSlice';
 
 const rootReducer = combineReducers({
   user: userReducer,

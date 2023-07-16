@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect} from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchPaymentMethods, setActivePaymentMethod, addPaymentMethod } from '../actions/PaymentActions';
+import { fetchPaymentMethods, setActivePaymentMethod, addPaymentMethod } from '../redux/paymentSlice';
 import AddPaymentMethod from './AddPaymentMethod';
 
 const PaymentScreen = () => {

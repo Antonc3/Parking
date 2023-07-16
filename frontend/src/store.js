@@ -1,7 +1,10 @@
-import { configureStore, applyMiddleware} from 'redux';
-import thunk from 'redux-thunk';
-import rootReducer from './reducers/index'; // Import your root reducer
+import { configureStore } from '@reduxjs/toolkit'
+import rootReducer from './redux/index'; // Import your root reducer
+import requireLoginMiddleware from './redux/requireLoginMiddleware'
 
-const store = configureStore(rootReducer, applyMiddleware(thunk)); // Create the Redux store
+const store = configureStore({
+    reducer: rootReducer,
+    middleware: (getDefaultMiddleware) => [...getDefaultMiddleware(), requireLoginMiddleware]
+}); // Create the Redux store
 
 export default store;

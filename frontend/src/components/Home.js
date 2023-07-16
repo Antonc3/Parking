@@ -1,36 +1,34 @@
 import React, { useEffect } from 'react';
-import connect from 'react-redux';
-import { fetchQrData } from '../actions/UserActions.js';
+import { View, Text } from 'react-native';
+import { fetchQrData } from '../redux/userSlice.js';
+import { useSelector, useDispatch } from 'react-redux';
 import QRCode from 'qrcode.react';
 
-const Home = ({ user, fetchQrData }) =>{
+const Home = () =>{
+    const user = useSelector((state) => state.user);
+    const dispatch = useDispatch();
     useEffect(() => {
         if(!user.qrDataReady){
-            fetchQrData();
+            dispatch(fetchQrData());
         }
     }, [user.qrCodeData, fetchQrData]);
     //add loading image later
     if(user.error){
-        return <div> Error: {user.error} </div>;
+        return (<View>
+            <Text>Error: {user.error}</Text>
+        </View>
+        );
     }
-    if(!user.qrDataReady){
-        return <div>
-            Loading...
-            </div>
+    if (!user.qrDataReady) {
+        return (<View>
+            <Text>Loading...</Text>
+        </View>
+        );
     }
     return (
-        <div>
-        <QRCode value={user.qrCodeData} />
-        </div>
+        <View>
+            <QRCode value={user.qrCodeData} />
+        </View>
     );
 };
-const mapStateToProps = (state) =>{
-    return {
-        user: state.user,
-    };
-};
-const mapDispatchToProps = {
-    fetchQrData,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(Home);
+export default (Home);

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Constants } from 'expo-constants';
+import  Constants from 'expo-constants';
 import { View, Text, TouchableOpacity, Alert } from 'react-native'
 import { CardField, useStripe } from '@stripe/stripe-react-native';
 

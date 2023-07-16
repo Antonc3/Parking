@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
-import { login } from '../actions/UserActions.js';
+import { useSelector, useDispatch} from 'react-redux';
+import { login } from '../redux/userSlice';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 
 
-const LoginScreen = ({ navigation, user, login}) => {
+const LoginScreen = ({ navigation}) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const user = useSelector((state) => state.user);
+    const dispatch = useDispatch();
 
     useEffect(() =>{
         if(user.isLoggedIn){
@@ -14,7 +16,7 @@ const LoginScreen = ({ navigation, user, login}) => {
         }
     }, [user.isLoggedIn]);
     const handleLogin = () => {
-        login(username,password);
+        dispatch(login({username,password}));
     };
 
     const handleCreateAccount = () => {
@@ -29,7 +31,7 @@ const LoginScreen = ({ navigation, user, login}) => {
         placeholder="Username"
         onChangeText={(text) => setUsername(text)}
         value={username}
-        keyboardType="Username"
+        keyboardType="default"
         autoCapitalize="none"
         />
 
@@ -41,9 +43,11 @@ const LoginScreen = ({ navigation, user, login}) => {
         />
 
         {user.error &&
-            (<div>
-                <p>Error: {user.error}</p>
-                </div>)
+            (
+            <View>
+                <Text>Error: {user.error}</Text>
+            </View>
+            )
         }
 
         <TouchableOpacity onPress={handleLogin}>
@@ -56,14 +60,5 @@ const LoginScreen = ({ navigation, user, login}) => {
         </View>
     );
 };
-const mapStateToProps = (state) => {
-    return {
-        user: state.user,
-    };
-};
-const mapDispstachToProps = {
-    login,
-}
 
-
-export default connect(mapStateToProps,mapDispstachToProps)(LoginScreen);
+export default (LoginScreen);

@@ -1,10 +1,10 @@
 import React, { useState, useEffect} from 'react';
-import { View, TextInput, Button, StyleSheet } from 'react-native';
-import { connect } from 'react-redux';
-import { createAccount } from '../actions/UserActions.js';
+import { Text,View, TextInput, Button } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
+import { createAccount } from '../redux/userSlice.js';
 
 
-const CreateAccountScreen = ({ navigation, user, createAccount }) => {
+const CreateAccountScreen = ({ navigation }) => {
     const [username, setUsername_] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -17,26 +17,26 @@ const CreateAccountScreen = ({ navigation, user, createAccount }) => {
         email: true,
         phoneNumber: true,
     });
+    const user = useSelector((state) => state.user);
+    const dispatch = useDispatch();
     useEffect(() =>{
         if(user.isLoggedIn){
             navigation.navigate('Home');
         }
     },[user.isLoggedIn]);
-    useEffect(() =>{
-
-    }, [user.error]);
 
     const handleCreateAccount = () => {
         const fieldsValid = validateFields();
         if (!fieldsValid) {
             return;
         }
-        createAccount(username,password,email,phone);
+        console.log(username,password,email,phoneNumber)
+        dispatch(createAccount({username,password,email,phone:phoneNumber}));
     };
 
     const validateFields = () => {
         let isValid = true;
-        const updatedValidFields = {
+        var updatedValidFields = {
             username: true,
             password: true,
             confirmPassword: true,
@@ -112,9 +112,11 @@ const CreateAccountScreen = ({ navigation, user, createAccount }) => {
         />
         {!validFields.phoneNumber && <Text >Invalid phone number</Text>}
         {user.error &&
-            (<div>
-                <p>Error: {user.error}</p>
-            </div>)
+            (<View>
+                <Text>
+                    Error: {user.error}
+                </Text>
+            </View>)
         }
 
         <Button title="Create Account" onPress={handleCreateAccount} />
@@ -122,15 +124,5 @@ const CreateAccountScreen = ({ navigation, user, createAccount }) => {
     );
 };
 
-const mapStateToProps = (state) =>{
-    return {
-        user: state.user,
-    };
-};
-const mapDispatchToProps = {
-    createAccount,
-};
-
-
-export default connect(mapStateToProps,mapDispatchToProps)(CreateAccountScreen);
+export default CreateAccountScreen;
 
