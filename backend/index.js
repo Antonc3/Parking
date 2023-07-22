@@ -1,13 +1,20 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const routes = require('./routes');
+const lotRoutes = require('./routes/lotRoutes');
+const userRoutes = require('./routes/userRoutes');
 const config = require('./config.js');
-const cors = require('cors')
+const cors = require('cors');
+const { createServer  } = require('http');
+const { setupSocket } = require("./socket");
+
 
 const serverPort = config.server.port;
 const serverHost = config.server.host;
 
 const app = express();
+const httpServer = createServer(app);
+setupSocket(httpServer);
+
 app.use(express.json());
 app.use(cors());
 
@@ -26,9 +33,10 @@ mongoose.connect(databaseUri, {
     });
 
 // Routes
-app.use('/', routes);
+app.use('/lot', lotRoutes);
+app.use('/user', userRoutes);
 
 // Start the server
-app.listen(serverPort, () => {
+httpServer.listen(serverPort, () => {
     console.log('Server started on port 3000');
 });

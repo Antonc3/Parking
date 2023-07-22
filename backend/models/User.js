@@ -28,9 +28,9 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
-    qrScanInTime: {
-        type: Number,
-        default: 0,
+    currentTicket: {
+        type: mongoose.Schema.Types.ObjectId,
+        reference: 'Ticket',
     },
     payment: {
         stripeCustomerId: {
