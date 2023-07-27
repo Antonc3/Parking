@@ -20,6 +20,9 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: '',
     },
+    socketId: {
+        type: String,
+    },
     qrIdentifier: {
         type: String,
         default: '',

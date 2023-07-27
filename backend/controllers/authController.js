@@ -132,10 +132,25 @@ const authenticateToken = (req, res, next) => {
     });
 }
 
+const decryptToken = (token) => {
+    if (!token) {
+        return null;
+    }
+
+    // Verify the token
+    jwt.verify(token, config.secret_key, (err, decodedToken) => {
+        if (err) {
+            return null;
+        }
+        return decodedToken;
+    });
+}
+
 module.exports = {
     createUser,
     login,
     authenticateToken,
     changePassword,
+    decryptToken,
 };
 

@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const lotRoutes = require('./routes/lotRoutes');
 const userRoutes = require('./routes/userRoutes');
+const stripeRoutes = requrie('./routes/stripeRoutes');
 const config = require('./config.js');
 const cors = require('cors');
 const { createServer  } = require('http');
@@ -35,6 +36,7 @@ mongoose.connect(databaseUri, {
 // Routes
 app.use('/lot', lotRoutes);
 app.use('/user', userRoutes);
+app.use('/stripe', stripeRoutes);
 
 // Start the server
 httpServer.listen(serverPort, () => {

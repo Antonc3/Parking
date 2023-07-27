@@ -19,6 +19,14 @@ const ticketSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'SingleLot',
         required: true,
+    },
+    stripe: {
+        paymentIntentId:{
+            type: String,
+        },
+        transferId: {
+            type: String,
+        }
     }
 });
 
