@@ -3,6 +3,7 @@ const Lot = require('../models/Lot');
 const SingleLot = require('../models/SingleLot');
 const Ticket = require('../models/Ticket');
 const socket = require('../socket');
+const config = require('../config');
 const stripe = require('stripe')(config.stripe.secret_key);
 
 const createSingleLot = async (req,res) => {
@@ -42,7 +43,8 @@ const createTicket = async (req,res) => {
         }
         var io = socket.getIoInstance();
         io.to(foundUser.socketId).emit("createTicketConfirmation ", {
-            singleLotId: signleLot._id 
+            lotName: curSingleLot.name,
+            singleLotId: curSingleLot._id,
         });
         return res.status(200).json({message: "Successfully sent ticket confirmation"})
     }

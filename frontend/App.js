@@ -3,7 +3,9 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import { Provider } from 'react-redux';
 import store from './src/store';
+import { loadTokenFromStorage } from './src/redux/userSlice';
 
+import React, { useEffect } from 'react' ;
 
 import LoginScreen from './src/components/LoginScreen.js';
 import CreateAccount from './src/components/CreateAccount.js';
@@ -14,6 +16,9 @@ import withAuthentication from './src/components/withAuthentication.js';
 const Stack = createStackNavigator();
 
 export default App = () => {
+    useEffect(() => {
+        store.dispatch(loadTokenFromStorage);
+    }, []);
     return (
         <Provider store={store}>
             <NavigationContainer>

@@ -125,7 +125,7 @@ const authenticateToken = (req, res, next) => {
         }
 
         // Attach the decoded token payload to the request object
-        req.user = decodedToken;
+        req.user = decodedToken.userId;
 
         // Proceed to the next middleware or route
         next();

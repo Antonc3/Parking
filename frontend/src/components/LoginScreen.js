@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch} from 'react-redux';
 import { login } from '../redux/userSlice';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity} from 'react-native';
 
 
 const LoginScreen = ({ navigation}) => {

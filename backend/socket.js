@@ -10,7 +10,7 @@ const setupSocket = (server) => {
 
     // Socket.io setup
     io.on('connection', (socket) => {
-        const userToken = socket.handshake.query.userToken;
+        const userToken = socket.handshake.auth.token;
         const userId = authController.decryptToken(userToken);
         User.findByIdAndUpdate(userId, {socketId: socket.id}, (err,user) => {
             if(err){

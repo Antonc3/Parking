@@ -26,13 +26,12 @@ const createLot = async (req, res) => {
             type: 'express',
             country: 'US',
             email,
-            name,
         });
         // Create a new user
         const newLot = new Lot({
-            name: name,
+            name,
+            email,
             password: hashedPassword,
-            phone: phone,
             stripeId: stripeAccount.id,
         });
 
@@ -85,7 +84,7 @@ const login = async (req, res) => {
     const { email, password } = req.body;
 
     // Find the user based on the username
-    const lot = await lot.findOne({ email });
+    const lot = await Lot.findOne({ email });
 
     // If user not found or password is incorrect, return an error response
     if (!lot || !(await bcrypt.compare(password, lot.password))) {
@@ -117,7 +116,7 @@ const authenticateToken = (req, res, next) => {
         }
 
         // Attach the decoded token payload to the request object
-        req.user = decodedToken;
+        req.user = decodedToken.userId;
 
         // Proceed to the next middleware or route
         next();
@@ -126,9 +125,17 @@ const authenticateToken = (req, res, next) => {
 
 const genLoginLink = async (req, res) => {
     const user = req.user;
+    console.log(user);
     try{
-        const lot = Lot.findById(user);
-        const loginLink = await Stripe.accounts.createLoginLink(
+        const lot = await Lot.findById(user);
+        console.log(lot);
+        if(!lot){
+            return res.status(400).json({
+                error: "cannot find required Lot"
+            })
+        }
+        console.log(lot)
+        const loginLink = await stripe.accounts.createLoginLink(
             lot.stripeId
         )
         return res.status(200).json({
@@ -144,12 +151,17 @@ const genLoginLink = async (req, res) => {
 const genAccountLink = async (req,res) => {
     const user = req.user;
     try{
-        const lot = Lot.findById(user);
+        const lot = await Lot.findById(user);
+        if(!lot){
+            return res.status(400).json({
+                error: "cannot find required Lot"
+            })
+        }
         var type = 'account_onboarding';
         if(lot.verified){
             type = 'account_update';
         }
-        const accountLink = await Stripe.accountLinks.create({
+        const accountLink = await stripe.accountLinks.create({
             account: lot.stripeId,
             refresh_url: config.stripe.onboarding_finish_url,
             return_url: config.stripe.onboarding_finish_url,

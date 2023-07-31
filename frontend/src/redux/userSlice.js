@@ -1,5 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { AsyncStorage } from 'react-native'
 import axios from 'axios'
+
 export const login = createAsyncThunk(
     'user/login',
     async ({username, password}, {getState,rejectWithValue}) =>{
@@ -12,6 +14,8 @@ export const login = createAsyncThunk(
             console.log(axios.defaults.baseURL);
             const response = await axios.post('/user/login', { username, password });
             const { token, user } = response.data;
+            await AsyncStorage.setItem('loginToken',token);
+            await AsyncStorage.setItem('username',user);
             return {token, username:user};
         } catch (error) {
             console.log(error)
@@ -50,6 +54,35 @@ export const fetchQrData = createAsyncThunk(
     }
 )
 
+export const loadTokenFromStorage = createAsyncThunk(
+    'user/loadTokenFromStorage',
+    async (_,{rejectWithValue}) => {
+        try{
+            const token = await AsyncStorage.getItem("loginToken");
+            const usernmae = await AsyncStorage.getItem("username");
+            if(token) {
+                return {token, username};
+            }
+        } catch(error) {
+            console.error('Error loading token from storage: ', error);
+            return rejectWithValue(error.message);
+        }
+    }
+)
+
+
+export const logout = createAsyncThunk(
+    'user/logout',
+    async (_,{rejectWithValue}) => {
+        try{
+            await AsyncStorage.removeItem("loginToken");
+            await AsyncStorage.removeItem("username");
+        } catch(error) {
+            console.error('Error removing token from storage: ', error);
+            return rejectWithValue(error.message);
+        }
+    }
+)
 const initialState = {
     username: '',
     token: '',
@@ -64,13 +97,11 @@ const userSlice = createSlice({
     name: 'user',
     initialState,
     reducers: {
-        logout: (state) =>{
-            state = initialState;
-        },
         resetQr: (state) =>{
             qrCodeData = '';
             qrCodeReady = false;
-        }
+        },
+
     },
     extraReducers: (builder) =>{
         builder
@@ -81,12 +112,23 @@ const userSlice = createSlice({
                 state.token = action.payload.token;
             }
         )
+        .addCase(logout.fulfilled,
+            (state, action) =>{
+                state = initialState;
+            }
+        )
         .addCase(fetchQrData.fulfilled,
             (state, action) =>{
                 state.qrCodeData = action.payload;
                 state.qrCodeReady = true;
             }
         )
+        .addCase(loadTokenFromStorage.fulfilled, 
+            (state, action) => {
+                state.isLoggedIn = true;
+                state.username = action.payload.username;
+                state.token = action.payload.token;
+            })
         .addMatcher(
             (action) => action.type.endsWith('/rejected'),
             (state, action) =>{
@@ -101,5 +143,5 @@ const userSlice = createSlice({
         )
     }
 })
-export const {logout, resetQr} = userSlice.actions;
+export const {resetQr} = userSlice.actions;
 export default userSlice.reducer;
