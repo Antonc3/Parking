@@ -27,10 +27,6 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: '',
     },
-    qrIdentifierInUse: {
-        type: Boolean,
-        default: false,
-    },
     currentTicket: {
         type: mongoose.Schema.Types.ObjectId,
         reference: 'Ticket',

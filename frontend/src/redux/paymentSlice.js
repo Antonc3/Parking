@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from '../api'
+import { logout } from "./authSlice";
 import DataStatus from "../status/DataStatus";
 
 export const fetchPaymentMethods = createAsyncThunk(
@@ -69,12 +70,14 @@ const paymentSlice = createSlice({
     name: 'payment',
     initialState,
     reducers: {
-        logout: (state) => {
-            state = initialState;
-        },
     },
     extraReducers: (builder) => {
         builder
+            .addCase(logout,
+                (state) => {
+                    state = initialState;
+                }
+            )
             .addCase(fetchPaymentMethods.fulfilled,
                 (state, action) => {
                     state.paymentMethods = action.payload.paymentMethods;
@@ -114,5 +117,4 @@ const paymentSlice = createSlice({
             )
     },
 });
-export const { logout } = paymentSlice.actions;
 export default paymentSlice.reducer;

@@ -1,20 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch} from 'react-redux';
-import { login } from '../redux/userSlice';
+import { login, clearErrors} from '../redux/authSlice';
 import { View, Text, TextInput, TouchableOpacity} from 'react-native';
 
 
 const LoginScreen = ({ navigation}) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const user = useSelector((state) => state.user);
+    const auth = useSelector((state) => state.auth);
     const dispatch = useDispatch();
+    useEffect(() => {
+        dispatch(clearErrors());
+    }, []);
 
     useEffect(() =>{
-        if(user.isLoggedIn){
+        if(auth.isLoggedIn){
             navigation.navigate('Home');
         }
-    }, [user.isLoggedIn]);
+    }, [auth.isLoggedIn]);
     const handleLogin = () => {
         dispatch(login({username,password}));
     };
@@ -42,10 +45,10 @@ const LoginScreen = ({ navigation}) => {
         secureTextEntry
         />
 
-        {user.error &&
+        {auth.error &&
             (
             <View>
-                <Text>Error: {user.error}</Text>
+                <Text>Error: {auth.error}</Text>
             </View>
             )
         }

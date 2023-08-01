@@ -1,7 +1,7 @@
 import React, { useState, useEffect} from 'react';
 import { Text,View, TextInput, Button } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { createAccount } from '../redux/userSlice.js';
+import { createAccount } from '../redux/authSlice.js';
 
 
 const CreateAccountScreen = ({ navigation }) => {
@@ -17,13 +17,16 @@ const CreateAccountScreen = ({ navigation }) => {
         email: true,
         phoneNumber: true,
     });
-    const user = useSelector((state) => state.user);
+    const auth = useSelector((state) => state.auth);
     const dispatch = useDispatch();
+    useEffect(() => {
+        dispatch(clearErrors());
+    }, []);
     useEffect(() =>{
-        if(user.isLoggedIn){
+        if(auth.isLoggedIn){
             navigation.navigate('Home');
         }
-    },[user.isLoggedIn]);
+    },[auth.isLoggedIn]);
 
     const handleCreateAccount = () => {
         const fieldsValid = validateFields();
@@ -111,10 +114,10 @@ const CreateAccountScreen = ({ navigation }) => {
         onChangeText={(text) => setPhoneNumber(text)}
         />
         {!validFields.phoneNumber && <Text >Invalid phone number</Text>}
-        {user.error &&
+        {auth.error &&
             (<View>
                 <Text>
-                    Error: {user.error}
+                    Error: {auth.error}
                 </Text>
             </View>)
         }

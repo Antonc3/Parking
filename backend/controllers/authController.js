@@ -132,6 +132,20 @@ const authenticateToken = (req, res, next) => {
     });
 }
 
+const checkTokenValid = async (req,res) => {
+    const userId = req.user;
+    try{
+        const foundUser = await User.findById(userId);
+        if(!foundUser){
+            return res.status(404).json({error: "token does not lead to a valid user"});
+        }
+        return res.status(200).json({message: "Token is valid!"});
+    }
+    catch(error){
+        return res.status(400).json({error: "Internal server error"});
+    }
+}
+
 const decryptToken = (token) => {
     if (!token) {
         return null;
@@ -152,5 +166,6 @@ module.exports = {
     authenticateToken,
     changePassword,
     decryptToken,
+    checkTokenValid,
 };
 

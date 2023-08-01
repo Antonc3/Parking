@@ -8,6 +8,8 @@ router.post('/login', authController.login);
 
 router.post('/create', authController.createUser);
 
+router.get('/checkTokenValid', authController.authenticateToken, authController.checkTokenValid);
+
 router.put('/changePassword',authController.authenticateToken, authController.changePassword);
 
 router.put('/genQrIdentifier',authController.authenticateToken, userController.updateQrIdentifier);

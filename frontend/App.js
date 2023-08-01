@@ -3,7 +3,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import { Provider } from 'react-redux';
 import store from './src/store';
-import { loadTokenFromStorage } from './src/redux/userSlice';
+import { loadTokenFromStorage } from './src/redux/authSlice';
 
 import React, { useEffect } from 'react' ;
 
@@ -17,7 +17,7 @@ const Stack = createStackNavigator();
 
 export default App = () => {
     useEffect(() => {
-        store.dispatch(loadTokenFromStorage);
+        store.dispatch(loadTokenFromStorage());
     }, []);
     return (
         <Provider store={store}>
