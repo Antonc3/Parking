@@ -4,23 +4,19 @@ import axios from 'axios'
 
 export const fetchQrData = createAsyncThunk(
     'user/fetchQrData',
-    async (_, {getState,rejectWithValue}) => {
-        console.log(token);
+    async (_, {rejectWithValue}) => {
         try{
             const response = await axios.get('/user/qrIdentifier');
-            console.log(response.data);
             return response.data.qrIdentifier;
         } catch(error) {
-            console.log(error);
             return rejectWithValue(error.message)
         }
     }
 )
 
-
 const initialState = {
     qrCodeData: '',
-    qrCodeReady: false,
+    qrDataReady: false,
     message: '',
 };
 
@@ -29,8 +25,8 @@ const userSlice = createSlice({
     initialState,
     reducers: {
         resetQr: (state) =>{
-            qrCodeData = '';
-            qrCodeReady = false;
+            state.qrCodeData = '';
+            state.qrDataReady = false;
         },
 
     },
@@ -39,7 +35,7 @@ const userSlice = createSlice({
         .addCase(fetchQrData.fulfilled,
             (state, action) =>{
                 state.qrCodeData = action.payload;
-                state.qrCodeReady = true;
+                state.qrDataReady = true;
             }
         )
         .addCase(logout,

@@ -7,9 +7,11 @@ let io;
 
 const setupSocket = (server) => {
     io = socketIo(server);
-
+    console.log("Creating Socket!");
     // Socket.io setup
     io.on('connection', (socket) => {
+        console.log("THERE IS A SOCKET CONNECTION!");
+        socket.emit("connect");
         const userToken = socket.handshake.auth.token;
         const userId = authController.decryptToken(userToken);
         User.findByIdAndUpdate(userId, {socketId: socket.id}, (err,user) => {

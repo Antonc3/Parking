@@ -14,6 +14,7 @@ const saveCard = async (req, res) => {
                 customer: user.payment.stripeCustomerId,
             }
         )
+        if(!user.activePaymentId) user.activePaymentId = paymentMethodId;
         user.save();
         res.status(200).json({message: 'Successfully saved card'});
     } catch (error) {
@@ -29,8 +30,8 @@ const getPaymentMethods = async (req,res) => {
         const paymentMethods = await stripe.paymentMethods.list({
             customer: customerId,
         })
-    return res.status(200).json({
-            paymentMethods,
+        return res.status(200).json({
+            paymentMethods: paymentMethods.data,
             activePaymentId: user.payment.activePaymentId,
         })
     } catch(error){
@@ -46,9 +47,12 @@ const setActivePaymentMethod = async (req,res) => {
             customer: customerId,
         })
         var foundPaymentId = false;
-        paymentMethods.forEach( (paymentMethod) =>{
+        console.log(paymentMethods);
+        console.log("activePaymentId: ",req.body.activePaymentId);
+        paymentMethods.data.forEach( (paymentMethod) =>{
             if(paymentMethod.id == req.body.activePaymentId) foundPaymentId = true;
         })
+        console.log("found payment id: ", foundPaymentId);
         if(!foundPaymentId){
             return res.status(400).json({error: 'Given Payment Method not found inside of users active payment methods'})
         }

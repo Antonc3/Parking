@@ -1,7 +1,7 @@
 import io from 'socket.io-client';
 import Constants from 'expo-constants';
 
-const socket = io(Constants.expoConfig.extra.REACT_APP_BACKEND_URL, {
+const socket = io("ws:/10.0.2.2:3000", {
     transports: ['websocket'],
     autoConnect: false,
 });

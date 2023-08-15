@@ -7,14 +7,16 @@ router.post('/login', lotAuthController.login);
 
 router.post('/create', lotAuthController.createLot);
 
+router.post('/singleLot/create',lotAuthController.authenticateToken,lotController.createSingleLot)
+
 router.put('/changePassword',lotAuthController.authenticateToken,lotAuthController.changePassword);
 
 router.get('/stripe/loginUrl', lotAuthController.authenticateToken, lotAuthController.genLoginLink);
 
 router.get('/stripe/accountUrl', lotAuthController.authenticateToken, lotAuthController.genAccountLink);
 
-router.post('/createTicket', lotAuthController.authenticateToken, lotController.createTicket);
+router.post('/ticket/create', lotAuthController.authenticateToken, lotController.createTicket);
 
-router.post('/endTicket', lotAuthController.authenticateToken, lotController.endTicket);
+router.post('/ticket/end', lotAuthController.authenticateToken, lotController.endTicket);
 
 module.exports = router;

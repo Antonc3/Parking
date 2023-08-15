@@ -1,7 +1,7 @@
 import React, { useState, useEffect} from 'react';
 import { Text,View, TextInput, Button } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { createAccount } from '../redux/authSlice.js';
+import { createAccount, clearErrors } from '../redux/authSlice.js';
 
 
 const CreateAccountScreen = ({ navigation }) => {
