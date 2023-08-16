@@ -42,6 +42,7 @@ const createTicket = async (req,res) => {
             res.status(400).json({error: "The single lot does not belong to the current lot"});
         }
         var io = socket.getIoInstance();
+        console.log("foudnUser socketID: ",foundUser.socketId);
         io.to(foundUser.socketId).emit("createTicketConfirmation ", {
             lotName: curSingleLot.name,
             singleLotId: curSingleLot._id,

@@ -4,6 +4,7 @@ backend/config.js
 frontend/app.config.js
 .expo/
 dist/
+test/
 npm-debug.*
 *.jks
 *.p8

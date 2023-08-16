@@ -1,8 +1,6 @@
 import axios from 'axios';
 import Constants from 'expo-constants'
-const { manifest } = Constants;
-const uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
-
+const uri = Constants.expoConfig.extra.REACT_APP_BACKEND_URL
 
 console.log(uri)
 axios.defaults.baseURL = uri;

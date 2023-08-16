@@ -9,19 +9,19 @@ const setupSocket = (server) => {
     io = socketIo(server);
     console.log("Creating Socket!");
     // Socket.io setup
-    io.on('connection', (socket) => {
+    io.on('connection', async (socket) => {
         console.log("THERE IS A SOCKET CONNECTION!");
-        socket.emit("connect");
-        const userToken = socket.handshake.auth.token;
-        const userId = authController.decryptToken(userToken);
-        User.findByIdAndUpdate(userId, {socketId: socket.id}, (err,user) => {
-            if(err){
-                console.error('Error updating socketid: ', err);
-            }
-            else{
-                console.log('SocketId updated for user: ', user.username);
-            }
-        });
+        try{
+            const userToken = socket.handshake.auth.token;
+            console.log("userToken: ", userToken);
+            const userId = authController.decryptToken(userToken).userId;
+            console.log("USERID: ", userId);
+            console.log(socket.id);
+            await User.findByIdAndUpdate(userId, { socketId: socket.id });
+        }
+        catch(error){
+            
+        }
         socket.on('confirmTicket', async (ticketData) => {
             const startDate = new Date();
             const foundUser = User.findById(userId);

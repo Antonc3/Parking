@@ -146,18 +146,19 @@ const checkTokenValid = async (req,res) => {
     }
 }
 
-const decryptToken = (token) => {
+    const decryptToken =  (token) => {
     if (!token) {
         return null;
     }
 
     // Verify the token
-    jwt.verify(token, config.secret_key, (err, decodedToken) => {
-        if (err) {
-            return null;
-        }
+    try{
+        const decodedToken = jwt.verify(token, config.secret_key);
         return decodedToken;
-    });
+    }
+    catch(error){
+        throw error;
+    }
 }
 
 module.exports = {
