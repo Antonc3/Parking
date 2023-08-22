@@ -7,7 +7,7 @@ export const fetchPaymentMethods = createAsyncThunk(
     'payment/fetchPaymentMethods',
     async (_, { rejectWithValue }) => {
         try {
-            const response = await axios.get('/user/payment/getPaymentMethods');
+            const response = await axios.get('/user/payment/paymentMethods');
             const {paymentMethods, activePaymentId} = response.data;
             return {
                 paymentMethods,

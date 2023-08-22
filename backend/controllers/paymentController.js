@@ -47,16 +47,13 @@ const setActivePaymentMethod = async (req,res) => {
             customer: customerId,
         })
         var foundPaymentId = false;
-        console.log(paymentMethods);
-        console.log("activePaymentId: ",req.body.activePaymentId);
         paymentMethods.data.forEach( (paymentMethod) =>{
             if(paymentMethod.id == req.body.activePaymentId) foundPaymentId = true;
         })
-        console.log("found payment id: ", foundPaymentId);
         if(!foundPaymentId){
             return res.status(400).json({error: 'Given Payment Method not found inside of users active payment methods'})
         }
-        user.activePaymentId= req.body.activePaymentId;
+        user.payment.activePaymentId= req.body.activePaymentId;
         user.save();
         res.status(200).json({
             message: "successfully set active payment"
@@ -80,7 +77,6 @@ const stripeWebhook = async (req,res) => {
     // Handle the event
     if (event.type === 'payment_intent.succeeded') {
         const paymentIntent = event.data.object;
-        console.log('PaymentIntent succeeded:', paymentIntent.id);
         const curTicketId = paymentIntent.metadata.ticketId;
         const curTicket = Ticket.findById(curTicketId);
         if(!curTicket){
@@ -105,9 +101,26 @@ const stripeWebhook = async (req,res) => {
     res.status(200).send('Received');
 }
 
+const getTicketHistory = async (req,res) => {
+    try{
+        const userId = req.user;
+        const foundUser = await User.findById(userId);
+        if(!foundUser){
+            res.status(400).json({error: "User not foudn"});
+        }
+        const foundTickets = await Ticket.find({user: userId});
+        return res.status(200).json({tickets: foundTickets});
+    }
+    catch(error){
+        console.log(error);
+        return res.status(500).json({error: "Internal server error"});
+    }
+}
+
 module.exports = {
     saveCard,
     getPaymentMethods,
     setActivePaymentMethod,
     stripeWebhook,
+    getTicketHistory,
 }

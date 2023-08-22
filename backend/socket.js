@@ -10,30 +10,37 @@ const setupSocket = (server) => {
     console.log("Creating Socket!");
     // Socket.io setup
     io.on('connection', async (socket) => {
+        var userId;
         console.log("THERE IS A SOCKET CONNECTION!");
         try{
             const userToken = socket.handshake.auth.token;
-            console.log("userToken: ", userToken);
-            const userId = authController.decryptToken(userToken).userId;
+            userId = authController.decryptToken(userToken).userId;
             console.log("USERID: ", userId);
-            console.log(socket.id);
+            console.log("Socket ID: ",socket.id);
             await User.findByIdAndUpdate(userId, { socketId: socket.id });
+            const foundUser = await User.findById(userId);
         }
         catch(error){
-            
+            console.log("SOCKET DISCONNECTING")
+            socket.disconnect();
+            return;
         }
         socket.on('confirmTicket', async (ticketData) => {
+            console.log("TICKET HAS BEEN CONFIMRED")
+            console.log("ticketData: ",ticketData);
+            console.log("userId:",userId)
             const startDate = new Date();
-            const foundUser = User.findById(userId);
-            const curSingleLot = SingleLot.findById(ticketData.singleLotId);
+            const foundUser = await User.findById(userId);
+            const curSingleLot = await SingleLot.findById(ticketData.singleLotId);
             const newTicket = new Ticket({
                 timeEntered: startDate,
-                user: foundUser._id,
-                singleLot: req.body.singleLot,
+                user: userId,
+                singleLot: ticketData.singleLotId,
             })
             await newTicket.save();
             foundUser.currentTicket = newTicket._id;
-            curSingleLot.currentTickets.push(newTicket); 
+            console.log("CUR SING LOT CUR TICK: ",curSingleLot.currentTickets);
+            curSingleLot.currentTickets.push(newTicket._id); 
             await curSingleLot.save();
             await foundUser.save();
         })

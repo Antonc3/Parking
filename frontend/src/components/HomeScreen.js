@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, Text } from 'react-native';
+import { Alert, View, Text } from 'react-native';
 import { fetchQrData } from '../redux/userSlice.js';
 import { useSelector, useDispatch } from 'react-redux';
 import QRCode from 'react-native-qrcode-svg';
@@ -30,8 +30,8 @@ const HomeScreen = () =>{
                 Alert.alert('Confirm Ticket Popup',
                     "Confirming entrance to: " + data.lotName,
                     [
-                        { text: 'Confirm', onPress: handleConfirmPopup(data) },
-                        { text: 'Reject', onPress: handleRejectPopup(data) },
+                        { text: 'Confirm', onPress: ()=>handleConfirmPopup(data) },
+                        { text: 'Reject', onPress: ()=>handleRejectPopup(data) },
                     ], { cancelable: false });
 
             });
@@ -52,6 +52,7 @@ const HomeScreen = () =>{
     }, [user.qrCodeData]);
 
     const handleConfirmPopup = (data) => {
+        console.log("CONFIRMING TICKET!")
         socket.emit('confirmTicket', data)
     }
     const handleRejectPopup = (data) => {

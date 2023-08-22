@@ -10,12 +10,16 @@ const SingleLotSchema = new mongoose.Schema({
         type: Number,
         required: true,
     },
+    minutesBeforePay: {
+        type: Number,
+        default: 15,
+    },
     lot: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Lot',
         required: true,
     },
-    curentTickets: [{
+    currentTickets: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Ticket',
     }]

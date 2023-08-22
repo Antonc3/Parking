@@ -10,7 +10,6 @@ const { setupSocket } = require("./socket");
 
 
 const serverPort = config.server.port;
-const serverHost = config.server.host;
 
 const app = express();
 const httpServer = createServer(app);

@@ -6,7 +6,7 @@ const ticketSchema = mongoose.Schema({
         required: true,
         immutable: true,
     },
-    timeExtited: {
+    timeExited: {
         type: Number,
         default: -1,
     },
@@ -19,6 +19,10 @@ const ticketSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'SingleLot',
         required: true,
+    },
+    amountPaid: {
+        type: Number,
+        default: 0,
     },
     stripe: {
         paymentIntentId:{

@@ -16,7 +16,9 @@ router.put('/genQrIdentifier',authController.authenticateToken, userController.u
 
 router.get('/qrIdentifier', authController.authenticateToken, userController.getQrIdentifier);
 
-router.get('/payment/getPaymentMethods', authController.authenticateToken, paymentController.getPaymentMethods);
+router.get('/payment/paymentMethods', authController.authenticateToken, paymentController.getPaymentMethods);
+
+router.get('/payment/ticketHistory', authController.authenticateToken, paymentController.getTicketHistory);
 
 router.post('/payment/saveCard', authController.authenticateToken, paymentController.saveCard);
 
