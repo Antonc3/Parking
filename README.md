@@ -21,7 +21,7 @@ export default {
     }
 }
 ```
-4. ```npx expo start``
+4. ```npx expo start```
 
 ## Get Started - Backend
 
