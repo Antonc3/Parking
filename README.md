@@ -9,10 +9,10 @@ Backend built using express, socket.io, mongoose
 Payment handled using stripe
 
 ## Get Started - Frontend
-Clone the project
-```cd frontend/```
-```npm install```
-Create a file named app.config.js
+1. ```cd frontend/```
+
+2. ```npm install```
+3. Create a file named app.config.js
 ```
 export default {
     extra:{
@@ -21,14 +21,16 @@ export default {
     }
 }
 ```
-```npx expo start``
+4. ```npx expo start``
 
-### Get Started - Backend
+## Get Started - Backend
 
 
-```cd backend/```
-```npm install```
-Create a file named config.js
+1. ```cd backend/```
+
+2. ```npm install```
+
+3. Create a file named config.js
 ```
 const config = {
   database: {
@@ -50,4 +52,5 @@ const config = {
 
 module.exports = config;
 ```
-```node index.js```
+
+4. ```node index.js```
