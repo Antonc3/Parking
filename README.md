@@ -53,4 +53,6 @@ const config = {
 module.exports = config;
 ```
 
-4. ```node index.js```
+4. Follow instructions on stripe to setup webhook, or download stripe cli and test webhook locally
+
+5. ```node index.js```

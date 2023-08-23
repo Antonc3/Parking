@@ -14,7 +14,7 @@ const saveCard = async (req, res) => {
                 customer: user.payment.stripeCustomerId,
             }
         )
-        if(!user.activePaymentId) user.activePaymentId = paymentMethodId;
+        if(!user.stripe.activePaymentId) user.stripe.activePaymentId = paymentMethodId;
         user.save();
         res.status(200).json({message: 'Successfully saved card'});
     } catch (error) {
@@ -66,37 +66,48 @@ const setActivePaymentMethod = async (req,res) => {
 
 const stripeWebhook = async (req,res) => {
     const event = req.body;
-    try {
-        const signature = req.headers['stripe-signature'];
-        event = stripe.webhooks.constructEvent(req.rawBody, signature, config.stripe_webhook_secret);
-    } catch (error) {
-        console.error('Webhook signature verification failed:', error.message);
-        return res.status(400).send('Webhook Error: Invalid signature');
+    const endpointSecret = config.stripe.webhookSecret;
+    if (endpointSecret) {
+        // Get the signature sent by Stripe
+        const signature = request.headers['stripe-signature'];
+        try {
+            event = stripe.webhooks.constructEvent(
+                request.body,
+                signature,
+                endpointSecret
+            );
+        } catch (err) {
+            console.log(`⚠️  Webhook signature verification failed.`, err.message);
+            return response.sendStatus(400);
+        }
     }
 
     // Handle the event
-    if (event.type === 'payment_intent.succeeded') {
-        const paymentIntent = event.data.object;
-        const curTicketId = paymentIntent.metadata.ticketId;
-        const curTicket = Ticket.findById(curTicketId);
-        if(!curTicket){
-            return res.status(400).json({error: "BAD TICKET"});
-        }
-        const curSingleLot = SingleLot.findById(curTicket.singleLot);
-        if(!curSingleLot){
-            return res.status(400).json({error: "BAD SingleLot"});
-        }
-        const curLot = Lot.findById(curSingleLot.lot);
-        if(!curLot){
-            return res.status(400).json({error: "BAD Lot"});
-        }
-        const amount = paymentIntent.amount;
-        const transfer = await stripe.transfers.create({
-            amount: amount,
-            currency: 'usd',
-            destination: curLot.stripeId,
-        });
-        curTicket.stripe.transferId = transfer.id;
+    switch (event.type) {
+        case 'payment_intent.succeeded':
+            const paymentIntent = event.data.object;
+            const curTicketId = paymentIntent.metadata.ticketId;
+            const curTicket = await Ticket.findById(curTicketId);
+            if (!curTicket) {
+                return res.status(400).json({ error: "BAD TICKET" });
+            }
+            const curSingleLot = await SingleLot.findById(curTicket.singleLot);
+            if (!curSingleLot) {
+                return res.status(400).json({ error: "BAD SingleLot" });
+            }
+            const curLot = await Lot.findById(curSingleLot.lot);
+            if (!curLot) {
+                return res.status(400).json({ error: "BAD Lot" });
+            }
+            const amount = paymentIntent.amount;
+            const transfer = await stripe.transfers.create({
+                amount: amount,
+                currency: 'usd',
+                destination: curLot.stripeId,
+            });
+            curTicket.stripe.transferId = transfer.id;
+        default:
+            console.log("unhandled event type")
     }
     res.status(200).send('Received');
 }
