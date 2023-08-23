@@ -12,6 +12,7 @@ const createSingleLot = async (req,res) => {
         if(!curLot) res.status(400).json({error: "Could not find current Lot"});
         const newSingleLot = new SingleLot({
             name: req.body.name,
+            location: req.body.location,
             hourlyRate: req.body.hourlyRate,
             lot: curLot._id,
         })
@@ -42,10 +43,6 @@ const createTicket = async (req,res) => {
             res.status(400).json({error: "The single lot does not belong to the current lot"});
         }
         var io = socket.getIoInstance();
-        console.log(foundUser)
-        console.log("foundUser socketid: ",foundUser.socketId);
-        const connectedSockets = io.sockets.sockets;
-        console.log(connectedSockets)
         io.to(foundUser.socketId).emit("createTicketConfirmation", {
             lotName: curSingleLot.name,
             singleLotId: curSingleLot._id,
@@ -118,6 +115,8 @@ const endTicket = async (req,res) => {
         await curSingleLot.save();
         await foundUser.save();
         await curLot.save();
+        var io = socket.getIoInstance();
+        io.to(foundUser.socketId).emit("ticketEnded");
         return res.status(200).json({message: "Successfully ended parking session!"});
     }
     catch(error){

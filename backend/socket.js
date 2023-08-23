@@ -43,6 +43,7 @@ const setupSocket = (server) => {
             curSingleLot.currentTickets.push(newTicket._id); 
             await curSingleLot.save();
             await foundUser.save();
+            io.to(foundUser.socketId).emit('ticketCreated');
         })
     });
 };

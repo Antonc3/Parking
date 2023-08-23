@@ -1,16 +1,28 @@
 import React, { useEffect } from 'react';
-import { Alert, View, Text } from 'react-native';
+import { Alert, View, Text, ScrollView} from 'react-native';
 import { fetchQrData } from '../redux/userSlice.js';
+import { fetchTicketHistory } from "../redux/paymentSlice.js"
 import { useSelector, useDispatch } from 'react-redux';
+
 import QRCode from 'react-native-qrcode-svg';
+//seperate socket into a different file some day
 import { io } from 'socket.io-client';
+import styles from '../style/style.js';
+
+import { Dimensions } from 'react-native';
 import Constants from 'expo-constants';
+
+import TicketList from './TicketList.js';
 
 const HomeScreen = () =>{
     const user = useSelector((state) => state.user);
     const auth = useSelector((state) => state.auth);
+    const { activeTicket} = useSelector ((state) => state.payment);
     const dispatch = useDispatch();
     var socket;
+    useEffect(() => {
+        dispatch(fetchTicketHistory());
+    }, [])
     useEffect(() => {
         if(auth.isLoggedIn){
             socket = io(Constants.expoConfig.extra.REACT_APP_BACKEND_URL,
@@ -35,6 +47,12 @@ const HomeScreen = () =>{
                     ], { cancelable: false });
 
             });
+            socket.on('ticketCreated', () => {
+                dispatch(fetchTicketHistory());
+            })
+            socket.on('ticketEnded', () => {
+                dispatch(fetchTicketHistory());
+            })
             return () => {
                 socket.disconnect();
             }
@@ -72,9 +90,30 @@ const HomeScreen = () =>{
         );
     }
     return (
-        <View>
-            <QRCode value={user.qrCodeData} />
-        </View>
+        <ScrollView>
+            <View style={styles.container}>
+                <View>
+                <QRCode
+                value={user.qrCodeData} 
+                size={Dimensions.get('window').width-32}
+                />
+                </View>
+            </View>
+            <View style={styles.container}>
+            {
+            (activeTicket === null) ?
+            <Text style={styles.header1}>
+                There is no active ticket!
+            </Text> :
+            <>
+                <Text>Lot Name: {activeTicket.lotName}</Text>
+                <Text>Lot Location: {activeTicket.lotLocation}</Text>
+                <Text>Date Entered: {new Date(activeTicket.timeEntered).toString}</Text>
+            </>
+            }
+            </View>
+            <TicketList />
+        </ScrollView>
     );
 };
 export default (HomeScreen);

@@ -109,7 +109,35 @@ const getTicketHistory = async (req,res) => {
             res.status(400).json({error: "User not foudn"});
         }
         const foundTickets = await Ticket.find({user: userId});
-        return res.status(200).json({tickets: foundTickets});
+        console.log(foundTickets);
+        var ticketList = [];
+        var activeTicket = null;
+        for(const tick of foundTickets){
+            const foundSingleLot = await SingleLot.findById(tick.singleLot);
+            var curTicketData = {
+                id: tick._id, 
+                lotName: foundSingleLot.name,
+                lotLocation: foundSingleLot.location,
+                dateEntered: new Date(tick.timeEntered).toString(),
+                amount: tick.amountPaid,
+            }
+            if(tick.timeExited==-1){
+                activeTicket = curTicketData;
+                return;
+            }
+            curTicketData.dateExited = new Date(tick.timeExited).toString();
+            if(tick.amountPaid > 0){
+                const paymentIntent = await stripe.paymentIntents.retrieve(tick.stripe.paymentIntentId);
+                curTicketData.paymentMethod = {
+                    last4: paymentIntent.payment_method.card.last4,
+                    brand: paymentIntent.payment_method.brand
+                }
+            }
+            console.log("pushing curTicketData: ",curTicketData);
+            ticketList.push(curTicketData)
+        }
+        console.log("ticketList: ",ticketList);
+        return res.status(200).json({activeTicket, tickets: ticketList});
     }
     catch(error){
         console.log(error);

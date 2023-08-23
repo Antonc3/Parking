@@ -6,6 +6,10 @@ const SingleLotSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    location: {
+        type: String,
+        required: true,
+    },
     hourlyRate: {
         type: Number,
         required: true,

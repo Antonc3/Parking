@@ -50,11 +50,27 @@ export const addPaymentMethod = createAsyncThunk(
             return rejectWithValue(error.message)
         }
     }
+)
 
+export const fetchTicketHistory = createAsyncThunk(
+    'payment/fetchTicketHistory',
+    async (_, {rejectWithValue}) => {
+        try {
+            const response = await axios.get('/user/payment/ticketHistory');
+            console.log(response.data);
+            return response.data;
+        }
+        catch(error){
+            console.log(error);
+            rejectWithValue(error);
+        }
+    }
 )
 const initialState = {
     paymentMethods: [],
     activePaymentId: '',
+    ticketHistory: [],
+    activeTicket: null,
     paymentStatus: DataStatus.IDLE,
     error: null,
 }
@@ -84,6 +100,12 @@ const paymentSlice = createSlice({
                     state.activePaymentId = action.payload;
                 }
             )
+            .addCase(fetchTicketHistory.fulfilled,
+                (state, action) => {
+                    state.ticketHistory = action.payload.tickets;
+                    state.activeTicket = action.payload.activeTicket;
+                }
+        )
             .addMatcher(
                 (action) => action.type.endsWith('/rejected'),
                 (state, action) => {

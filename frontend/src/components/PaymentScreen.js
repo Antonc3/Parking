@@ -14,7 +14,7 @@ const PaymentScreen = () => {
     useEffect(() => {
         console.log("dispatching fetch paymentMethodds");
         dispatch(fetchPaymentMethods()); // Fetch payment methods from API on component mount
-    }, [dispatch]);
+    }, []);
 
     const handlePaymentMethodChange = (paymentMethodId) => {
         dispatch(setActivePaymentMethod({activePaymentId: paymentMethodId}));
