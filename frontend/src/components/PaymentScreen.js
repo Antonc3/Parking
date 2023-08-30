@@ -25,7 +25,6 @@ const PaymentScreen = () => {
     };
 
     if(paymentStatus === DataStatus.SUCCESS){
-        console.log("Payment methods: ",paymentMethods);
         return (
             <View>
                 <Text style={styles.header1}>Select Payment Method</Text>

@@ -40,6 +40,9 @@ const createTicket = async (req,res) => {
         if(!foundUser){
             return res.status(400).json({error: "There is no user that matches the following qrData"});
         }
+        if(foundUser.currentTicket){
+            return res.status(400).json({error: "User already has an active ticket"});
+        }
         if(curSingleLot.lot != req.user){
             return res.status(400).json({error: "The single lot does not belong to the current lot"});
         }

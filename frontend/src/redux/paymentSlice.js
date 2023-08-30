@@ -56,8 +56,9 @@ export const fetchTicketHistory = createAsyncThunk(
     'payment/fetchTicketHistory',
     async (_, {rejectWithValue}) => {
         try {
+            console.log("TRYUING TO FETCH TICKET HSITOYR");
             const response = await axios.get('/user/payment/ticketHistory');
-            console.log(response.data);
+            console.log("fetching ticket history: ",response.data);
             return response.data;
         }
         catch(error){

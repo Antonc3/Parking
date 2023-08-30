@@ -11,12 +11,9 @@ const setupSocket = (server) => {
     // Socket.io setup
     io.on('connection', async (socket) => {
         var userId;
-        console.log("THERE IS A SOCKET CONNECTION!");
         try{
             const userToken = socket.handshake.auth.token;
             userId = authController.decryptToken(userToken).userId;
-            console.log("USERID: ", userId);
-            console.log("Socket ID: ",socket.id);
             await User.findByIdAndUpdate(userId, { socketId: socket.id });
             const foundUser = await User.findById(userId);
         }
@@ -39,11 +36,11 @@ const setupSocket = (server) => {
             })
             await newTicket.save();
             foundUser.currentTicket = newTicket._id;
-            console.log("CUR SING LOT CUR TICK: ",curSingleLot.currentTickets);
             curSingleLot.currentTickets.push(newTicket._id); 
             await curSingleLot.save();
             await foundUser.save();
             io.to(foundUser.socketId).emit('ticketCreated');
+            console.log("emmited ticketCreated")
         })
     });
 };

@@ -13,6 +13,14 @@ const styles = StyleSheet.create({
     container: {
         padding: 16
     },
+    lightGreyContainer: {
+        padding: 16,
+        backgroundColor: 'rgb(248,248,248)',
+    },
+    whiteContainer: {
+        padding: 16,
+        backgroundColor: 'white',
+    },
     cardField: {
         height: 50,
         width: Dimensions.get('window').width-32,

@@ -6,15 +6,12 @@ import axios from 'axios'
 export const login = createAsyncThunk(
     'user/login',
     async ({username, password}, {dispatch, getState,rejectWithValue}) =>{
-        console.log("LOGIN:",username,password)
         const {isLoggedIn} = getState().user;
         if(isLoggedIn) {//
             return rejectWithValue("Already logged in");
         }
         try {
-            console.log(axios.defaults.baseURL);
             const response = await axios.post('/user/login', { username, password });
-            console.log("login: ", response.data);
             const { token } = response.data;
             await AsyncStorage.setItem('loginToken',token);
             await AsyncStorage.setItem('username',username);
@@ -29,7 +26,6 @@ export const createAccount = createAsyncThunk(
     'auth/create',
     async ({username,password,email,phone}, {dispatch, rejectWithValue}) =>{
         try{
-            console.log(username,password,email,phone)
             const response = await axios.post('/user/create', { username, password, phone, email });
             await dispatch(login({username,password}));
         } catch (error) {
@@ -43,22 +39,16 @@ export const loadTokenFromStorage = createAsyncThunk(
     async (_,{dispatch, rejectWithValue}) => {
         try{
             const token = await AsyncStorage.getItem("loginToken");
-            console.log("TOKEN: ", token);
             const username = await AsyncStorage.getItem("username");
-            console.log("username: ", username);
             if(token) {
                 axios.defaults.headers.common = { 'Authorization': `Bearer: ${token}` };
-                console.log('axios common: ',axios.defaults.headers.common);
                 try{
                     const response = await axios.get('/user/checkTokenValid');
-                    console.log("LOAD FROM STORAGE CHECK TOKEN VALID: ", response.data);
                 }
                 catch (error) {
-                    console.log("FETCH TOKEN FROM STORAGE ERROR: ",error);
                     await dispatch(logout());
                     return rejectWithValue(error.message);
                 }
-                console.log("SUCCESSFULLY fetched token: ", username);
                 return {token, username };
             }
             console.log("no valid token in async storage");

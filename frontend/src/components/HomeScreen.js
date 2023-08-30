@@ -21,6 +21,7 @@ const HomeScreen = () =>{
     const dispatch = useDispatch();
     var socket;
     useEffect(() => {
+        console.log("FETCHING TICKET HISTORY");
         dispatch(fetchTicketHistory());
     }, [])
     useEffect(() => {
@@ -33,7 +34,6 @@ const HomeScreen = () =>{
                     }
                 }
             )
-            console.log("CONNECTING SOCKET");
             socket.on('connect', () => {
                 console.log("SOCKET CONNECTED!@@!@!");
             })
@@ -48,6 +48,7 @@ const HomeScreen = () =>{
 
             });
             socket.on('ticketCreated', () => {
+                console.log("RECIEVED TICEKTD DECREATED")
                 dispatch(fetchTicketHistory());
             })
             socket.on('ticketEnded', () => {
@@ -63,7 +64,6 @@ const HomeScreen = () =>{
     }, [auth.isLoggedIn])
 
     useEffect(() => {
-        console.log("QR DATA READY: ",user.qrDataReady);
         if(!user.qrDataReady){
             dispatch(fetchQrData());
         }
@@ -99,16 +99,21 @@ const HomeScreen = () =>{
                 />
                 </View>
             </View>
-            <View style={styles.container}>
+            <View style={styles.whiteContainer}>
             {
             (activeTicket === null) ?
             <Text style={styles.header1}>
                 There is no active ticket!
             </Text> :
             <>
+            <Text style={styles.header1}>
+                Current Active Ticket:
+            </Text>
+            <View style={styles.lightGreyContainer}>
                 <Text>Lot Name: {activeTicket.lotName}</Text>
                 <Text>Lot Location: {activeTicket.lotLocation}</Text>
-                <Text>Date Entered: {new Date(activeTicket.timeEntered).toString}</Text>
+                <Text>Date Entered: {activeTicket.dateEntered}</Text>
+            </View>
             </>
             }
             </View>

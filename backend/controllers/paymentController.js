@@ -120,10 +120,10 @@ const getTicketHistory = async (req,res) => {
             res.status(400).json({error: "User not foudn"});
         }
         const foundTickets = await Ticket.find({user: userId});
-        console.log(foundTickets);
         var ticketList = [];
         var activeTicket = null;
         for(const tick of foundTickets){
+            console.log("TICK: ",tick);
             const foundSingleLot = await SingleLot.findById(tick.singleLot);
             var curTicketData = {
                 id: tick._id, 
@@ -134,7 +134,7 @@ const getTicketHistory = async (req,res) => {
             }
             if(tick.timeExited==-1){
                 activeTicket = curTicketData;
-                return;
+                continue;
             }
             curTicketData.dateExited = new Date(tick.timeExited).toString();
             if(tick.amountPaid > 0){
