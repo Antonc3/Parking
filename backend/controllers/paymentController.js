@@ -14,7 +14,7 @@ const saveCard = async (req, res) => {
                 customer: user.payment.stripeCustomerId,
             }
         )
-        if(!user.stripe.activePaymentId) user.stripe.activePaymentId = paymentMethodId;
+        if(!user.payment || !user.payment.activePaymentId) user.payment.activePaymentId = paymentMethodId;
         user.save();
         res.status(200).json({message: 'Successfully saved card'});
     } catch (error) {

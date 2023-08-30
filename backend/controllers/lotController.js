@@ -32,15 +32,16 @@ const createTicket = async (req,res) => {
     //req.body.qrData is the car
     try{
         const curSingleLot = await SingleLot.findById(req.body.singleLot);
+        console.log(curSingleLot);
         if(!curSingleLot){
-            res.status(400).json({ error: "Could not find current single Lot" });
+            return res.status(400).json({ error: "Could not find current single Lot" });
         }
         const foundUser = await User.findOne({qrIdentifier: req.body.qrData});
         if(!foundUser){
-            res.status(400).json({error: "There is no user that matches the following qrData"});
+            return res.status(400).json({error: "There is no user that matches the following qrData"});
         }
         if(curSingleLot.lot != req.user){
-            res.status(400).json({error: "The single lot does not belong to the current lot"});
+            return res.status(400).json({error: "The single lot does not belong to the current lot"});
         }
         var io = socket.getIoInstance();
         io.to(foundUser.socketId).emit("createTicketConfirmation", {
